@@ -1,0 +1,2 @@
+from ppq.utils.TensorRTUtil import build_engine
+build_engine(onnx_file='/home/wangsiyuan/ppq/model_int8.onnx', int8_scale_file='/home/wangsiyuan/ppq/quant_cfg.json', engine_file='/home/wangsiyuan/ppq/int8.engine', int8=True, fp16 = True)
