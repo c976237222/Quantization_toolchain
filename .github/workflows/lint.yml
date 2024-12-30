@@ -13,15 +13,15 @@ jobs:
           python-version: 3.7
       - name: Install pre-commit hook
         run: |
-          pwd&&ls
+          pwd && ls
           pip install pre-commit
           pre-commit --version
       - name: pre-commit checking
         run: |
           git fetch
           git branch -a
-          git diff --name-status remotes/origin/master HEAD
-          updated_files=`git diff --name-status remotes/origin/master HEAD|awk '{print$ 2}'` 
+          git diff --name-status remotes/origin/main HEAD
+          updated_files=$(git diff --name-status remotes/origin/main HEAD | awk '{print $2}')
           echo $updated_files
           for file in $updated_files
           do
@@ -30,4 +30,3 @@ jobs:
               pre-commit run --files $file --show-diff-on-failure
             fi
           done
-
