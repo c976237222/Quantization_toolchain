@@ -15,3 +15,12 @@ __pycache__/
 *.bin
 *.engine
 *.json
+*.txt
+*.JEPG
+*.pt
+*.jpg
+*.png
+*.tar
+*.gz
+*.cache
+working_*/data
