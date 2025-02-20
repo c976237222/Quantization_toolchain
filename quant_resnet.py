@@ -1,7 +1,7 @@
 from ppq import *                                       
 from ppq.api import *
 import os
-from ppq.utils.TensorRTUtil import build_engine
+from ppq.utils.TensorRTUtil import build_engine, Benchmark, Profiling
 import time
 import tensorrt as trt
 import sys
@@ -22,16 +22,15 @@ EXECUTING_DEVICE      = 'cuda'                            # 'cuda' or 'cpu'.
 REQUIRE_ANALYSE       = False
 TRAINING_YOUR_NETWORK = True                              # 是否需要 Finetuning 一下你的网络
 
-
+base_model = False
 need_quantized = False
 need_compile_model = False
-need_accuracy = True
-need_performance = False
-label_path = os.path.join(WORKING_DIRECTORY, 'val.txt')
-graph = None
-output_onnx = os.path.join(WORKING_DIRECTORY, 'resnet_int8.onnx')
-output_config = os.path.join(WORKING_DIRECTORY, 'resnet_int8_cfg.json')
-output_engine = os.path.join(WORKING_DIRECTORY, 'resnet_int8.engine')
+need_accuracy = False
+need_performance = True
+
+output_onnx = os.path.join(WORKING_DIRECTORY, 'resnet_base.onnx')
+output_config = os.path.join(WORKING_DIRECTORY, 'resnet_base_cfg.json')
+output_engine = os.path.join(WORKING_DIRECTORY, 'resnet_base.engine')
 QS = QuantizationSettingFactory.default_setting()
 
 if TRAINING_YOUR_NETWORK: #还有多种微调方式
@@ -71,7 +70,7 @@ if need_quantized:
                                                         # 你当然也可以用 torch dataloader 的那个，然后设置这个为 None
         platform=TARGET_PLATFORM,
         device=EXECUTING_DEVICE,
-        do_quantize=True)
+        do_quantize= not base_model)
     
     print('网络量化结束，正在生成目标文件:')
     export_ppq_graph(
@@ -82,10 +81,13 @@ if need_quantized:
     
 if need_compile_model:
     print('网络量化结束，正在生成engine:')
-    builder = trt_infer.EngineBuilder()
-    builder.create_network(output_onnx)
-    builder.create_engine(engine_path=output_engine, precision="int8")
-    # check_dynamic_batch(output_engine)
+    if not base_model:
+        build_engine(onnx_file=output_onnx, 
+                    int8_scale_file=output_config, 
+                    engine_file=output_engine, int8=True, fp16 = True)
+    else:
+        build_engine(onnx_file=output_onnx, 
+                engine_file=output_engine, int8=False, fp16 = False)
 
 if need_accuracy:
     print("计算量化后模型精确度")
@@ -95,14 +97,19 @@ if need_accuracy:
     test_loader = load_test_data(test_dir,batch_size=CALIBRATION_BATCHSIZE)
     #base pt
     model = load_pretrained_resnet18(device) 
-    evaluate_model_pt(model, test_loader, device)#Accuracy on the test dataset: 67.29%
+    evaluate_model_pt(model, test_loader, device)#Accuracy on the test dataset: 67.29% 5000 [01:05<00:00, 76.66it/s]
     #engine
-    evaluate_resnet_tensorrt_engine(output_engine, test_loader, device) #Accuracy on test dataset: 67.27%
+    evaluate_resnet_tensorrt_engine(output_engine, test_loader, device) #Accuracy on test dataset: 67.16% 5000 [01:03<00:00, 78.13batch/s]
     
     
 
     
 if need_performance:
-    from ppq.utils.TensorRTUtil import build_engine, Benchmark, Profiling
-    Benchmark(output_engine)
-    Profiling(output_engine)
+    print("base")
+    base_engine = "working_resnet/resnet_base.engine"
+    Benchmark(base_engine, steps=1000)#2.1651 sec
+    Profiling(base_engine, steps=1000)
+    print("int8")
+    int8_engine = "working_resnet/resnet_int8.engine"
+    Benchmark(int8_engine, steps=1000)#0.6415 sec
+    Profiling(int8_engine, steps=1000) 

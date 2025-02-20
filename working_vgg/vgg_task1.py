@@ -18,7 +18,6 @@ def tensorrt_inference(engine, samples, batch_size: int = 1):
     logger = trt.Logger(trt.Logger.ERROR)
     with open(engine, 'rb') as f, trt.Runtime(logger) as runtime:
         engine = runtime.deserialize_cuda_engine(f.read())
-    TensorRT_Results = []
     with engine.create_execution_context() as context:
         inputs, outputs, bindings, stream = trt_infer.allocate_buffers(context.engine)
         inputs[0].host = convert_any_to_numpy(samples).astype(np.float32)

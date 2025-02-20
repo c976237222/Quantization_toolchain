@@ -1,36 +1,33 @@
 from ppq import *                                       
 from ppq.api import *
 import os
-from ppq.utils.TensorRTUtil import build_engine
+from ppq.utils.TensorRTUtil import build_engine, Benchmark, Profiling
 import time
 import tensorrt as trt
 import sys
 sys.path.append('/home/wangsiyuan/ppq/ppq/samples/TensorRT')
 import trt_infer
-import onnx
-from working_resnet.resnet_task import load_test_data, load_pretrained_resnet18, evaluate_model_pt
-from working_resnet.resnet_task_engine import evaluate_resnet_tensorrt_engine   
+import onnx 
 # modify configuration below:
 
 WORKING_DIRECTORY = '/home/wangsiyuan/ppq/working_ssd'                             # choose your working directory
 TARGET_PLATFORM   = TargetPlatform.TRT_INT8          # choose your target platform
 MODEL_TYPE        = NetworkFramework.ONNX                 # or NetworkFramework.CAFFE
 INPUT_LAYOUT          = 'chw'                             # input data layout, chw or hwc
-CALIBRATION_BATCHSIZE = 10                              # batchsize of calibration dataset
+CALIBRATION_BATCHSIZE = 1                              # batchsize of calibration dataset
 NETWORK_INPUTSHAPE    = [CALIBRATION_BATCHSIZE, 3, 300, 300]                  # input shape of your network
 EXECUTING_DEVICE      = 'cuda'                            # 'cuda' or 'cpu'.
-REQUIRE_ANALYSE       = False
 TRAINING_YOUR_NETWORK = True                              # 是否需要 Finetuning 一下你的网络
 
-
+base_model = False
 need_quantized = True
 need_compile_model = True
 need_accuracy = False
 need_performance = False
-graph = None
-output_onnx = os.path.join(WORKING_DIRECTORY, 'ssd_int8.onnx')
-output_config = os.path.join(WORKING_DIRECTORY, 'ssd_int8_cfg.json')
-output_engine = os.path.join(WORKING_DIRECTORY, 'ssd_int8.engine')
+name = "int8"
+output_onnx = os.path.join(WORKING_DIRECTORY, f'ssd_{name}.onnx')
+output_config = os.path.join(WORKING_DIRECTORY, f'ssd_{name}_cfg.json')
+output_engine = os.path.join(WORKING_DIRECTORY, f'ssd_{name}.engine')
 QS = QuantizationSettingFactory.default_setting()
 
 if TRAINING_YOUR_NETWORK: #还有多种微调方式
@@ -40,12 +37,11 @@ if TRAINING_YOUR_NETWORK: #还有多种微调方式
     QS.lsq_optimization_setting.block_size         = 4
     QS.lsq_optimization_setting.lr                 = 1e-5
     QS.lsq_optimization_setting.gamma              = 0
-    QS.lsq_optimization_setting.is_scale_trainable = True
-
-QS.dispatching_table.append(operation='OP NAME', platform=TargetPlatform.FP32) #不适用于量化节点 转成fp32
+    QS.lsq_optimization_setting.is_scale_trainable = False
+    QS.ssd_equalization = False
+    
+#QS.dispatching_table.append(operation='OP NAME', platform=TargetPlatform.FP32) #不适用于量化节点 转成fp32
 # 在量化之前，将 Resize 的动态输入绑定为静态尺寸
-# QS.dispatching_table.append(operation='/model.10/Resize', platform=TargetPlatform.FP32)
-# QS.dispatching_table.append(operation='/model.13/Resize', platform=TargetPlatform.FP32)
 
 print('正准备量化你的网络，检查下列设置:')
 print(f'WORKING DIRECTORY    : {WORKING_DIRECTORY}')
@@ -61,7 +57,7 @@ if need_quantized:
 
     quantized = quantize_onnx_model(
         setting=QS,                     # setting 对象用来控制标准量化逻辑
-        onnx_import_file="/home/wangsiyuan/ppq/working_ssd/ssd_model.onnx",
+        onnx_import_file="/home/wangsiyuan/ppq/working_ssd/mb1-ssd.onnx",
         calib_dataloader=dataloader,
         calib_steps=32,
         input_shape=NETWORK_INPUTSHAPE, # 如果你的网络只有一个输入，使用这个参数传参
@@ -70,8 +66,11 @@ if need_quantized:
                                                         # 你当然也可以用 torch dataloader 的那个，然后设置这个为 None
         platform=TARGET_PLATFORM,
         device=EXECUTING_DEVICE,
-        do_quantize=True)
-    
+        do_quantize=not base_model)
+    print("SNR")
+    snr_report = graphwise_error_analyse(
+        graph=quantized, running_device=EXECUTING_DEVICE, 
+        dataloader=dataloader, collate_fn=lambda x: x.to(EXECUTING_DEVICE))
     print('网络量化结束，正在生成目标文件:')
     export_ppq_graph(
         graph=quantized, platform=TARGET_PLATFORM,
@@ -81,27 +80,23 @@ if need_quantized:
     
 if need_compile_model:
     print('网络量化结束，正在生成engine:')
-    builder = trt_infer.EngineBuilder()
-    builder.create_network(output_onnx)
-    builder.create_engine(engine_path=output_engine, precision="int8")
-    # check_dynamic_batch(output_engine)
+    if not base_model:
+        build_engine(onnx_file=output_onnx, 
+                    int8_scale_file=output_config, 
+                    engine_file=output_engine, int8=True, fp16 = True)
+    else:
+        build_engine(onnx_file=output_onnx, 
+                engine_file=output_engine, int8=False, fp16 = False)
 
 if need_accuracy:
     print("计算量化后模型精确度")
-    import torch
-    test_dir = f"/share/wangsiyuan-local/datasets/imagenet/val5000"
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    test_loader = load_test_data(test_dir,batch_size=CALIBRATION_BATCHSIZE)
-    #base pt
-    model = load_pretrained_resnet18(device) 
-    evaluate_model_pt(model, test_loader, device)#Accuracy on the test dataset: 67.29%
-    #engine
-    evaluate_resnet_tensorrt_engine(output_engine, test_loader, device) #Accuracy on test dataset: 67.27%
-    
-    
 
-    
 if need_performance:
-    from ppq.utils.TensorRTUtil import build_engine, Benchmark, Profiling
-    Benchmark(output_engine)
-    Profiling(output_engine)
+    print("base")
+    base_engine = f"{WORKING_DIRECTORY}/ssd_base.engine"
+    Benchmark(base_engine, steps=1000)# 1.0173 sec
+    # Profiling(base_engine, steps=1000)
+    print("int8")
+    int8_engine = f"{WORKING_DIRECTORY}/ssd_int8.engine"
+    Benchmark(int8_engine, steps=1000)# 0.4286 sec
+    # Profiling(int8_engine, steps=1000) 

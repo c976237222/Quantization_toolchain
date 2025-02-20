@@ -69,5 +69,5 @@ def convert_images_to_npy(input_directory, output_directory, input_shape=(300, 3
 # 示例用法
 if __name__ == "__main__":
     input_directory = "/home/wangsiyuan/ssd-pytorch/VOCdevkit_1/VOC2007/JPEGImages"  # 输入图像目录
-    output_directory = "/share/wangsiyuan-local/datasets/VOCdevkit/VOC2007/npy"  # 输出 .npy 文件的目录
-    convert_images_to_npy(input_directory, output_directory, input_shape=(300, 300), limit=5000)
+    output_directory = "/share/wangsiyuan-local/datasets/VOCdevkit/VOC2007/npy_ssd"  # 输出 .npy 文件的目录
+    convert_images_to_npy(input_directory, output_directory, input_shape=(300, 300), limit=1000)

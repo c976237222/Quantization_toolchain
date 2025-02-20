@@ -1,0 +1,72 @@
+#base:mAP = 86.92%
+#mAP = 3.41% => mAP = 3.41% finetune 
+Layer           | NOISE:SIGNAL POWER RATIO 
+/vgg.26/Conv:   | ████████████████████ | 0.214% #取消
+/vgg.24/Conv:   | ███████████████      | 0.165% #取消
+/vgg.19/Conv:   | ███████████          | 0.122% #取消
+/vgg.12/Conv:   | █████████            | 0.103%
+/vgg.17/Conv:   | █████████            | 0.100%
+/loc.0/Conv:    | █████████            | 0.095%
+/vgg.10/Conv:   | ████████             | 0.089%
+/vgg.5/Conv:    | ██████               | 0.070%
+/vgg.21/Conv:   | ██████               | 0.064%
+/vgg.7/Conv:    | ████                 | 0.051%
+/loc.1/Conv:    | ███                  | 0.039%
+/vgg.14/Conv:   | ███                  | 0.038%
+/vgg.28/Conv:   | ██                   | 0.029%
+/loc.5/Conv:    | ██                   | 0.027%
+/loc.3/Conv:    | ██                   | 0.024%
+/loc.2/Conv:    | ██                   | 0.022%
+/extras.0/Conv: | █                    | 0.020%
+/vgg.31/Conv:   | █                    | 0.018%
+/conf.5/Conv:   | █                    | 0.018%
+/conf.0/Conv:   | █                    | 0.016%
+/extras.2/Conv: | █                    | 0.016%
+/extras.6/Conv: | █                    | 0.015%
+/loc.4/Conv:    | █                    | 0.014%
+/conf.4/Conv:   | █                    | 0.011%
+/conf.2/Conv:   |                      | 0.011%
+/conf.3/Conv:   |                      | 0.010%
+/extras.4/Conv: |                      | 0.009%
+/extras.3/Conv: |                      | 0.009%
+/extras.1/Conv: |                      | 0.009%
+/vgg.2/Conv:    |                      | 0.009%
+/vgg.33/Conv:   |                      | 0.007%
+/vgg.0/Conv:    |                      | 0.007%
+/extras.7/Conv: |                      | 0.007%
+/conf.1/Conv:   |                      | 0.006%
+/extras.5/Conv: |                      | 0.006%
+
+================================================
+Layer           | NOISE:SIGNAL POWER RATIO 
+/vgg.28/Conv:   | ████████████████████ | 0.129%
+/vgg.12/Conv:   | ██████████████████   | 0.115%
+/loc.0/Conv:    | ███████████████      | 0.098%
+/vgg.17/Conv:   | ██████████████       | 0.093%
+/vgg.5/Conv:    | ███████████          | 0.074%
+/vgg.21/Conv:   | █████████            | 0.062%
+/vgg.7/Conv:    | ███████              | 0.050%
+/vgg.14/Conv:   | ███████              | 0.048%
+/extras.7/Conv: | ██████               | 0.041%
+/loc.1/Conv:    | █████                | 0.037%
+/loc.5/Conv:    | █████                | 0.035%
+/vgg.31/Conv:   | ███                  | 0.025%
+/loc.2/Conv:    | ███                  | 0.024%
+/loc.3/Conv:    | ███                  | 0.023%
+/extras.0/Conv: | ██                   | 0.020%
+/conf.5/Conv:   | ██                   | 0.017%
+/extras.2/Conv: | ██                   | 0.016%
+/conf.0/Conv:   | ██                   | 0.016%
+/loc.4/Conv:    | █                    | 0.014%
+/extras.6/Conv: | █                    | 0.012%
+/extras.3/Conv: | █                    | 0.011%
+/conf.2/Conv:   | █                    | 0.010%
+/conf.4/Conv:   | █                    | 0.010%
+/extras.4/Conv: | █                    | 0.010%
+/conf.3/Conv:   | █                    | 0.009%
+/extras.1/Conv: | █                    | 0.009%
+/vgg.2/Conv:    |                      | 0.008%
+/vgg.33/Conv:   |                      | 0.006%
+/vgg.0/Conv:    |                      | 0.006%
+/conf.1/Conv:   |                      | 0.006%
+/extras.5/Conv: |                      | 0.005%

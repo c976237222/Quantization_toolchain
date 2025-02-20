@@ -280,7 +280,7 @@ class MyProfiler(trt.IProfiler):
         print('You should notice that inference time != Lantancy, cause layer can be executed concurrently.')
 
 
-def Benchmark(engine_file: str, steps: int = 10000) -> float:
+def Benchmark(engine_file: str, steps: int = 3000) -> float:
     """ Benckmark TensorRT Engine """
     logger = trt.Logger(trt.Logger.INFO)
     import pycuda.autoinit

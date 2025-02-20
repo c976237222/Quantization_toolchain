@@ -64,6 +64,7 @@ def tensorrt_inference(engine_path, samples, batch_size: int = 1):
         argmax_result = torch.argmax(torch.tensor(result).view(-1, 1000), dim=-1).to(samples.device)  # Ensure result is on the same device
     return argmax_result
 
+
 def evaluate_resnet_tensorrt_engine(engine_path, test_loader, device='cuda'):
     """
     在测试集上评估量化的 ResNet TensorRT 引擎。
@@ -78,22 +79,53 @@ def evaluate_resnet_tensorrt_engine(engine_path, test_loader, device='cuda'):
     """
     correct = 0
     total = 0
+    logger = trt.Logger(trt.Logger.ERROR)
 
-    for data_batch, labels in tqdm(test_loader, desc="Evaluating", unit="batch"):
-        # 将数据移至设备
-        data_batch = data_batch.to(device)
-        labels = labels.to(device)  # Ensure labels are on the same device
+    # ✅ 创建 CUDA 上下文，防止多线程 CUDA 句柄错误
+    global_cfx = cuda.Device(0).make_context()
 
-        # 使用 TensorRT 进行推理
-        batch_results = tensorrt_inference(engine_path, data_batch, batch_size=len(data_batch))
-        # 计算预测准确性
-        correct += (batch_results == labels).sum().item()
-        print(correct)
-        total += labels.size(0)
+    with open(engine_path, 'rb') as f, trt.Runtime(logger) as runtime:
+        engine = runtime.deserialize_cuda_engine(f.read())
 
+    with engine.create_execution_context() as context:
+        # ✅ 申请 TensorRT 缓冲区
+        inputs, outputs, bindings, stream = trt_infer.allocate_buffers(engine)
+
+        # ✅ 遍历测试数据
+        for data_batch, labels in tqdm(test_loader, desc="Evaluating", unit="batch"):
+            # ✅ 将数据移动到 CUDA 设备
+            data_batch = data_batch.to(device)
+            labels = labels.to(device)
+
+            # ✅ 确保 TensorRT 的输入形状匹配 batch size
+            batch_size = data_batch.shape[0]
+            context.set_binding_shape(0, (batch_size, 3, 224, 224))  # 适用于 ResNet
+
+            # ✅ 绑定输入数据到 TensorRT
+            inputs[0].host = data_batch.cpu().numpy().astype(np.float32)
+
+            # ✅ 进行 TensorRT 推理
+            global_cfx.push()  # 绑定 CUDA 上下文
+            result = trt_infer.do_inference(
+                context, bindings=bindings, inputs=inputs,
+                outputs=outputs, stream=stream, batch_size=batch_size
+            )[0]
+            global_cfx.pop()  # 释放 CUDA 上下文
+
+            # ✅ 将推理结果转换为 Tensor
+            result_tensor = torch.tensor(result, dtype=torch.float32, device=device).view(batch_size, 1000)
+
+            # ✅ 计算预测准确率
+            argmax_result = torch.argmax(result_tensor, dim=-1)
+            correct += (argmax_result == labels).sum().item()
+            total += labels.size(0)
+
+    # ✅ 计算最终准确率
     accuracy = correct / total * 100
     print(f"Accuracy on test dataset: {accuracy:.2f}%")
+
     return accuracy
+
 
 # 示例用法
 # engine_path = 'path/to/resnet50.trt'

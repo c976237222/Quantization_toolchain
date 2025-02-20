@@ -1,0 +1,66 @@
+#base:mAP = 80.93%
+#mAP = 3.41% => mAP = 10.75% finetune 
+Layer                                        | NOISE:SIGNAL POWER RATIO 
+/backbone/dark2/dark2.1/m/m.0/cv2/conv/Conv: | ████████████████████ | 1.406%
+/conv3_for_downsample2/m/m.0/cv1/conv/Conv:  | ██████████████       | 1.023%
+/conv3_for_downsample1/cv3/conv/Conv:        | █████████████        | 0.957%
+/conv3_for_downsample1/m/m.0/cv2/conv/Conv:  | █████████████        | 0.923%
+/down_sample1/conv/Conv:                     | █████████████        | 0.913%
+/conv3_for_downsample2/cv3/conv/Conv:        | ████████████         | 0.884%
+/conv3_for_downsample2/m/m.0/cv2/conv/Conv:  | ████████████         | 0.865%
+/down_sample2/conv/Conv:                     | ████████████         | 0.861%
+/backbone/dark2/dark2.1/cv3/conv/Conv:       | ████████████         | 0.856%
+/conv3_for_downsample2/cv1/conv/Conv:        | ████████████         | 0.840%
+/conv3_for_downsample1/cv1/conv/Conv:        | ████████████         | 0.835%
+/conv3_for_downsample2/cv2/conv/Conv:        | ███████████          | 0.811%
+/backbone/dark3/dark3.1/m/m.1/cv1/conv/Conv: | ███████████          | 0.778%
+/backbone/dark3/dark3.1/cv2/conv/Conv:       | ███████████          | 0.777%
+/conv3_for_upsample2/cv3/conv/Conv:          | ███████████          | 0.754%
+/conv3_for_downsample1/m/m.0/cv1/conv/Conv:  | ██████████           | 0.716%
+/backbone/dark3/dark3.1/m/m.2/cv2/conv/Conv: | ██████████           | 0.694%
+/conv3_for_downsample1/cv2/conv/Conv:        | ██████████           | 0.691%
+/backbone/dark5/dark5.2/m/m.0/cv1/conv/Conv: | █████████            | 0.642%
+/backbone/dark2/dark2.1/cv1/conv/Conv:       | █████████            | 0.637%
+/backbone/dark3/dark3.1/m/m.1/cv2/conv/Conv: | █████████            | 0.636%
+/conv3_for_upsample1/cv3/conv/Conv:          | █████████            | 0.619%
+/backbone/dark2/dark2.1/m/m.0/cv1/conv/Conv: | ████████             | 0.601%
+/backbone/dark3/dark3.0/conv/Conv:           | ████████             | 0.601%
+/backbone/dark4/dark4.1/m/m.2/cv2/conv/Conv: | ████████             | 0.597%
+/conv_for_feat3/conv/Conv:                   | ████████             | 0.584%
+/backbone/dark5/dark5.2/cv3/conv/Conv:       | ████████             | 0.582%
+/backbone/dark4/dark4.1/cv2/conv/Conv:       | ████████             | 0.579%
+/backbone/dark4/dark4.1/m/m.1/cv1/conv/Conv: | ████████             | 0.546%
+/backbone/dark2/dark2.1/cv2/conv/Conv:       | ███████              | 0.540%
+/conv_for_feat2/conv/Conv:                   | ███████              | 0.526%
+/backbone/dark3/dark3.1/m/m.2/cv1/conv/Conv: | ███████              | 0.525%
+/backbone/dark5/dark5.2/m/m.0/cv2/conv/Conv: | ███████              | 0.525%
+/backbone/dark3/dark3.1/m/m.0/cv1/conv/Conv: | ███████              | 0.519%
+/conv3_for_upsample1/cv2/conv/Conv:          | ███████              | 0.517%
+/backbone/dark5/dark5.2/cv2/conv/Conv:       | ███████              | 0.498%
+/conv3_for_upsample1/m/m.0/cv2/conv/Conv:    | ███████              | 0.498%
+/conv3_for_upsample2/cv2/conv/Conv:          | ███████              | 0.490%
+/backbone/dark4/dark4.1/m/m.1/cv2/conv/Conv: | ███████              | 0.488%
+/backbone/dark4/dark4.1/m/m.0/cv1/conv/Conv: | ██████               | 0.459%
+/backbone/dark4/dark4.1/m/m.2/cv1/conv/Conv: | ██████               | 0.455%
+/backbone/dark5/dark5.2/cv1/conv/Conv:       | ██████               | 0.454%
+/backbone/dark3/dark3.1/cv3/conv/Conv:       | ██████               | 0.448%
+/backbone/dark4/dark4.0/conv/Conv:           | ██████               | 0.445%
+/backbone/dark5/dark5.0/conv/Conv:           | ██████               | 0.430%
+/conv3_for_upsample1/m/m.0/cv1/conv/Conv:    | ██████               | 0.424%
+/backbone/dark3/dark3.1/m/m.0/cv2/conv/Conv: | ██████               | 0.408%
+/conv3_for_upsample2/m/m.0/cv2/conv/Conv:    | █████                | 0.397%
+/backbone/dark4/dark4.1/cv3/conv/Conv:       | █████                | 0.376%
+/conv3_for_upsample1/cv1/conv/Conv:          | ████                 | 0.318%
+/backbone/dark5/dark5.1/cv1/conv/Conv:       | ████                 | 0.303%
+/backbone/dark3/dark3.1/cv1/conv/Conv:       | ███                  | 0.267%
+/backbone/dark5/dark5.1/cv2/conv/Conv:       | ███                  | 0.266%
+/backbone/dark4/dark4.1/m/m.0/cv2/conv/Conv: | ███                  | 0.251%
+/backbone/dark4/dark4.1/cv1/conv/Conv:       | ███                  | 0.231%
+/conv3_for_upsample2/cv1/conv/Conv:          | ███                  | 0.200%
+/conv3_for_upsample2/m/m.0/cv1/conv/Conv:    | ██                   | 0.188%
+/backbone/dark2/dark2.0/conv/Conv:           | ██                   | 0.165%
+/backbone/stem/conv/conv/Conv:               |                      | 0.054%
+/yolo_head_P3/Conv:                          |                      | 0.038%
+/yolo_head_P4/Conv:                          |                      | 0.033%
+/yolo_head_P5/Conv:                          |                      | 0.026%
+----------------------------------------------------------------------------
